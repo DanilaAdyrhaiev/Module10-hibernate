@@ -1,5 +1,6 @@
 package org.goit.CrudService;
 
+import org.goit.entities.Client;
 import org.goit.entities.Planet;
 import org.goit.utils.HibernateUtil;
 import org.hibernate.Session;
@@ -17,6 +18,32 @@ public class PlanetCrudService {
             transaction.commit();
         } catch (Exception e) {
             throw new RuntimeException("User creation failed");
+        }
+    }
+
+    public Planet readPlanetById(long id) {
+        try (Session session = getSession()
+        ) {
+            Planet planet = session.get(Planet.class, id);
+            session.close();
+            return planet;
+        }
+    }
+
+    public void updatePlanetById(long id, String name) {
+        try (Session session = getSession()) {
+            Transaction transaction = session.beginTransaction();
+            Planet planet = session.get(Planet.class, id);
+            if (planet != null) {
+                planet.setName(name);
+                session.persist(planet);
+                transaction.commit();
+            } else {
+                throw new NoSuchElementException();
+            }
+            session.close();
+        } catch (NoSuchElementException e) {
+            throw new NoSuchElementException("Client with such ID doesn't exist");
         }
     }
 
